@@ -2,9 +2,10 @@ from tkinter import Tk, Checkbutton, Label, Button, Frame, Toplevel, Entry, mess
 from datetime import datetime
 from os import path
 
-file_dir = __file__
-
-print("DIRETÓRIO DO ARQUIVO: " + path.abspath(file_dir))
+file_dir = path.dirname(__file__)
+print("DIRETÓRIO DO ARQUIVO: " + file_dir)
+caminho = path.join(file_dir, "tasks.txt")
+print("CAMINHO DO ARQUIVO: " + caminho)
 
 
 
@@ -20,9 +21,9 @@ janela.title("Task Vini")
 # FUNÇÕES
 
 
-def saving_tasks(task_name):
+def saving_tasks(task_name, caminho):
 
-    with open("./ToDo/tasks.txt", "a") as file:
+    with open(caminho, "a") as file:
         file.write(task_name + "\n")
 
 
@@ -113,7 +114,7 @@ def adding_task(window, entry):
         data_task.grid(row=row_position, column=1, sticky="nsew")
 
         # SALVANDO A TASK EM UM ARQUIVO TXT
-        saving_tasks(task_name)
+        saving_tasks(task_name, caminho)
 
     else:
         messagebox.showinfo("Information", "You can only add 5 tasks")
