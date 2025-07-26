@@ -3,11 +3,9 @@ from datetime import datetime
 from os import path
 
 file_dir = path.dirname(__file__)
-print("DIRETÓRIO DO ARQUIVO: " + file_dir)
-caminho = path.join(file_dir, "tasks.txt")
+caminho = path.join(file_dir, "data", "tasks.txt")
+caminho_date = path.join(file_dir, "data", "date.txt")
 print("CAMINHO DO ARQUIVO: " + caminho)
-
-
 
 
 
@@ -20,11 +18,13 @@ janela.title("Task Vini")
 
 # FUNÇÕES
 
-
-def saving_tasks(task_name, caminho):
+def saving_tasks(task_name, caminho, date):
 
     with open(caminho, "a") as file:
         file.write(task_name + "\n")
+
+    with open(caminho_date, "a") as file:
+        file.write(date + "\n")
 
 
 
@@ -79,6 +79,24 @@ def add_new_task():
 
 
 
+def load_task(task, date="Undefined"):
+    """
+    FUNÇÃO QUE COLOCA AS TASKS DO ARQUIVO tasks.txt SE O USUÁRIO JÁ TEM ALGO GUARDADO
+
+    PARÂMETRO:
+        - task: A linha do arquivo que contem o nome da task, será passada com um open() no final do arquivo antes do mainloop()
+
+    """
+
+    row_position = change_grid_row()
+
+    # COLOCA A TASK CARREGADA
+    check = Checkbutton(frame_inferior, text=task, height=
+    3, anchor="w", activebackground="#3C4346", bg="#101213", fg="gray", font=("Times New Roman", 15), highlightthickness=0)
+    check.grid(row=row_position, column=0, sticky="nsew")
+
+    data_task = Label(frame_inferior, text=date, width=12, height=3, font=("Times New Roman", 15),bg="#222729", fg="gray")
+    data_task.grid(row=row_position, column=1, sticky="nsew")
 
 
 def adding_task(window, entry):
@@ -114,7 +132,7 @@ def adding_task(window, entry):
         data_task.grid(row=row_position, column=1, sticky="nsew")
 
         # SALVANDO A TASK EM UM ARQUIVO TXT
-        saving_tasks(task_name, caminho)
+        saving_tasks(task_name, caminho, date)
 
     else:
         messagebox.showinfo("Information", "You can only add 5 tasks")
@@ -170,4 +188,28 @@ frame_inferior.grid_rowconfigure((0, 1, 2, 3, 4), weight=1, uniform="a")
 
 
 
+
+"""
+LENDO TASKS SALVAS E PASSANDO PRA FUNÇÃO load_task(), SE HOUVER ALGO SALVO
+TAMBÉM LÊ A DATA DE SUAS RESPECTIVAS TASKS E CRIA UM ITERADOR PARA SER USADO NO MESMO
+LAÇO FOR ONDE É COLOCADO AS TASKS
+"""
+try:
+    # ABRE O ARQUIVO tasks.txt
+    with open(caminho, "r") as file, open(caminho_date, "r") as date_file:
+        lines = file.readlines()
+        tasks = list(map(lambda x: x.strip(), lines)) # RETIRA OS "\n"
+    
+        date_lines = date_file.readlines()
+        dates = list(map(lambda x: x.strip(), date_lines)) # RETIRA OS "\n"
+        date = iter(dates) # Criei um iterador das linhas de date.txt
+
+        for task in tasks:
+            load_task(task, next(date))
+
+
+except FileNotFoundError:
+    pass
+
 janela.mainloop()
+
