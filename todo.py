@@ -1,5 +1,13 @@
 from tkinter import Tk, Checkbutton, Label, Button, Frame, Toplevel, Entry, messagebox
 from datetime import datetime
+from os import path
+
+file_dir = __file__
+
+print("DIRETÓRIO DO ARQUIVO: " + path.abspath(file_dir))
+
+
+
 
 
 janela = Tk()
