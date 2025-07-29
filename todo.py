@@ -1,19 +1,23 @@
-from tkinter import Tk, Checkbutton, Label, Button, Frame, Toplevel, Entry, messagebox
+from tkinter import Tk, Checkbutton, Label, Button, Frame, Toplevel, Entry, messagebox, BooleanVar
 from datetime import datetime
 from os import path
+from re import match, compile
+
+whitespaces = compile(r"^\s+$")
 
 file_dir = path.dirname(__file__)
 caminho = path.join(file_dir, "data", "tasks.txt")
 caminho_date = path.join(file_dir, "data", "date.txt")
 print("CAMINHO DO ARQUIVO: " + caminho)
 
+task_list = []
 
 
 janela = Tk()
 janela.geometry("800x400")
 janela.resizable(False, False)
 janela.config(bg="#222729")
-janela.title("Task Vini")
+janela.title("TaskVini")
 
 
 # FUNÇÕES
@@ -21,13 +25,16 @@ janela.title("Task Vini")
 def saving_tasks(task_name, caminho, date):
 
     with open(caminho, "a") as file:
-        file.write(task_name + "\n")
+        file.write(task_name.strip() + "\n")
 
     with open(caminho_date, "a") as file:
         file.write(date + "\n")
 
 
+def placing_task(tasks, position):
 
+    for i, task in enumerate(tasks):
+        task.grid(row=i, column=0, sticky="nsew")
 
 
 def task_date():
@@ -115,30 +122,42 @@ def adding_task(window, entry):
     """
 
     task_name = entry.get()
+
+    if match(whitespaces, task_name) or task_name == "":
+        return messagebox.showerror("Error","Please, type your task name")
+    
     window.destroy()
 
     row_position = change_grid_row()
 
     if row_position < 5:
 
-        check = Checkbutton(frame_inferior, text=task_name, height=
-        3, anchor="w", activebackground="#3C4346", bg="#101213", fg="gray", font=("Times New Roman", 15), highlightthickness=0)
-        check.grid(row=row_position, column=0, sticky="nsew")
+        check_task = BooleanVar()
+
+        # A TASK EM SI
+        check = Checkbutton(frame_inferior, text=task_name.strip(), height=
+        3, anchor="w", activebackground="#3C4346", bg="#101213", fg="gray", font=("Times New Roman", 15), highlightthickness=0, variable=check_task)
+
 
         # DATA DE CRIAÇÃO DA TASK
         date = task_date()
 
         data_task = Label(frame_inferior, text=date, width=12, height=3, font=("Times New Roman", 15),bg="#222729", fg="gray")
-        data_task.grid(row=row_position, column=1, sticky="nsew")
+
 
         # SALVANDO A TASK EM UM ARQUIVO TXT
         saving_tasks(task_name, caminho, date)
+
+        task_list.append(check)
+
+        placing_task(task_list, row_position)
 
     else:
         messagebox.showinfo("Information", "You can only add 5 tasks")
 
     
-
+def ver_lista():
+    print(task_list)
 
 
 
@@ -161,16 +180,19 @@ frame_superior.pack(fill="x")
 # O TÍTULO: TASK
 task = Label(frame_superior, text="Tasks", font=("Times New Roman", 20), anchor="w", fg="gray", bg="#222729")
 
-task.pack(padx=20, pady=(30, 5), fill="x", side="left")
-
-
+task.pack(padx=20, pady=(30, 5), side="left")
 
 
 # O BOTÃO ADICIONAR TASK
 add_task = Button(frame_superior, text="Add new task", bg="gray", highlightthickness=0, relief="flat", fg="white", activebackground="black", activeforeground="gray", command=add_new_task)
 
-add_task.pack(side="right", padx=20, pady=(30, 5))
+add_task.pack(side="right", padx=(10, 20), pady=(30, 5))
 
+
+# O BOTÃO REMOVE TASK
+remove_task = Button(frame_superior, text="Delete", bg="#FC6F6F", highlightthickness=0, relief="flat", fg="white", activebackground="darkred", activeforeground="white", command=ver_lista)
+
+remove_task.pack(side="right", pady=(30, 5))
 
 
 
